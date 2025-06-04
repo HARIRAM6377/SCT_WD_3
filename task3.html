@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skill Crafts Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      --glass: rgba(255, 255, 255, 0.25);
+      --accent-x: #6a5acd;
+      --accent-o: #ff6b6b;
+      --win: #66de93;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--gradient);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+
+    .container {
+      background: var(--glass);
+      padding: 30px 20px;
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: fit-content;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+      width: 240px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .cell {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      font-weight: bold;
+    }
+
+    .cell:hover {
+      transform: scale(1.05);
+      background: #f0f0f0;
+    }
+
+    .cell.win {
+      background: var(--win) !important;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #555;
+    }
+
+    #restartBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #6a5acd;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #restartBtn:hover {
+      background: #5a4ac8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Skill Crafts Tic Tac Toe</h1>
+    <div class="scoreboard">
+      <div>X Wins: <span id="xScore">0</span></div>
+      <div>O Wins: <span id="oScore">0</span></div>
+    </div>
+    <div class="board" id="board">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+    <div class="status" id="status">Turn: X</div>
+    <button id="restartBtn">🔁 Restart</button>
+  </div>
+
+  <audio id="clickSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_48b37faad4.mp3"></audio>
+
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    const statusText = document.getElementById('status');
+    const xScoreText = document.getElementById('xScore');
+    const oScoreText = document.getElementById('oScore');
+    const restartBtn = document.getElementById('restartBtn');
+    const clickSound = document.getElementById('clickSound');
+
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let xWins = 0;
+    let oWins = 0;
+
+    const WINNING_COMBINATIONS = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+
+    function handleClick(e) {
+      const cell = e.target;
+      if (cell.textContent || !gameActive) return;
+
+      clickSound.play();
+      cell.textContent = currentPlayer;
+      cell.style.color = currentPlayer === 'X' ? 'var(--accent-x)' : 'var(--accent-o)';
+
+      if (checkWinner()) {
+        statusText.textContent = `${currentPlayer} Wins 🎉`;
+        if (currentPlayer === 'X') xScoreText.textContent = ++xWins;
+        else oScoreText.textContent = ++oWins;
+        gameActive = false;
+        setTimeout(resetBoard, 1500);
+        return;
+      }
+
+      if ([...cells].every(cell => cell.textContent)) {
+        statusText.textContent = `It's a Draw 😐`;
+        gameActive = false;
+        setTimeout(resetBoard, 1500);
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      statusText.textContent = `Turn: ${currentPlayer}`;
+    }
+
+    function checkWinner() {
+      return WINNING_COMBINATIONS.some(comb => {
+        const [a, b, c] = comb;
+        if (
+          cells[a].textContent &&
+          cells[a].textContent === cells[b].textContent &&
+          cells[a].textContent === cells[c].textContent
+        ) {
+          cells[a].classList.add('win');
+          cells[b].classList.add('win');
+          cells[c].classList.add('win');
+          return true;
+        }
+        return false;
+      });
+    }
+
+    function resetBoard() {
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('win');
+      });
+      currentPlayer = 'X';
+      statusText.textContent = 'Turn: X';
+      gameActive = true;
+    }
+
+    restartBtn.addEventListener('click', resetBoard);
+    cells.forEach(cell => cell.addEventListener('click', handleClick));
+  </script>
+</body>
+</html>
+
+
