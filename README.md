@@ -1,5 +1,7 @@
 # Skill Crafts Tic Tac Toe
 
+live server link:https://hariram6377.github.io/SCT_WD_3/task3.html
+
 Skill Crafts Tic Tac Toe is a responsive, visually appealing web-based game developed using HTML, CSS, and JavaScript. The project focuses on delivering a smooth and interactive user experience with a modern UI, sound effects, and core gameplay features.
 
 1.Features
