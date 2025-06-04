@@ -17,5 +17,5 @@ Skill Crafts Tic Tac Toe is a responsive, visually appealing web-based game deve
 - CSS3 for styling and animations
 - JavaScript (ES6) for game logic and interactivity
 
-3.live site link:-http://127.0.0.1:5500/task3.html
+
 
